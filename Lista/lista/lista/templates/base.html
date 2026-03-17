@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}App de Tarefas{% endblock %}</title>
+</head>
+<body>
+    <header style="padding: 15px; background-color: #f4f4f4; border-bottom: 1px solid #ccc; margin-bottom: 20px;">
+        <nav style="display: flex; gap: 10px; align-items: center;">
+            <a href="{% url 'lista' %}"><button>Lista</button></a>
+            <a href="{% url 'gerencia_tarefa' %}"><button>Gerenciar Tarefas</button></a>
+            
+            {% if user.is_authenticated %}
+                <span style="margin-left: auto;">Olá, <strong>{{ user.username }}</strong>!</span>
+                <a href="{% url 'logout' %}"><button>Sair</button></a>
+            {% else %}
+                <a href="{% url 'cadastro' %}"><button>Cadastrar</button></a>
+                <a href="{% url 'login' %}"><button>Login</button></a>
+            {% endif %}
+        </nav>
+    </header>
+
+    <main>
+        {% block content %}
+        <!-- O conteúdo específico de cada página será injetado aqui -->
+        {% endblock %}
+    </main>
+</body>
+</html>

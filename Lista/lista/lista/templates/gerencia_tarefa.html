@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block title %}Gerenciamento de Tarefas{% endblock %}
+
+{% block content %}
+    <h2>Gerenciamento de Tarefas</h2>
+
+    <!-- Formulário para Criar ou Editar Tarefa -->
+    <fieldset>
+        <legend>{% if tarefa_edit %}Editar Tarefa{% else %}Nova Tarefa{% endif %}</legend>
+        <form method="POST" action="{% url 'gerencia_tarefa' %}">
+            {% csrf_token %}
+            {% if tarefa_edit %}
+                <input type="hidden" name="acao" value="editar">
+                <input type="hidden" name="tarefa_id" value="{{ tarefa_edit.id }}">
+            {% else %}
+                <input type="hidden" name="acao" value="criar">
+            {% endif %}
+            
+            <div>
+                <label for="nome">Nome da Tarefa:</label>
+                <input type="text" id="nome" name="nome" value="{{ tarefa_edit.nome|default:'' }}" required>
+            </div>
+            <div>
+                <label for="descricao">Descrição:</label>
+                <textarea id="descricao" name="descricao">{{ tarefa_edit.descricao|default:'' }}</textarea>
+            </div>
+            <button type="submit">{% if tarefa_edit %}Salvar Alterações{% else %}Criar Tarefa{% endif %}</button>
+            {% if tarefa_edit %}
+                <a href="{% url 'gerencia_tarefa' %}">Cancelar</a>
+            {% endif %}
+        </form>
+    </fieldset>
+
+    <hr>
+
+    <!-- Lista de Tarefas Cadastradas -->
+    <h3>Minhas Tarefas</h3>
+    <ul>
+        {% for tarefa in tarefas %}
+            <li>
+                <span {% if tarefa.concluida %}style="text-decoration: line-through; color: gray;"{% endif %}>
+                    <strong>{{ tarefa.nome }}</strong> - {{ tarefa.descricao }}
+                </span>
+                
+                <!-- Botão Concluir -->
+                <form method="POST" action="{% url 'gerencia_tarefa' %}" style="display:inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="acao" value="concluir">
+                    <input type="hidden" name="tarefa_id" value="{{ tarefa.id }}">
+                    <button type="submit">{% if tarefa.concluida %}Desmarcar{% else %}Concluir{% endif %}</button>
+                </form>
+
+                <!-- Botão Editar -->
+                <form method="GET" action="{% url 'gerencia_tarefa' %}" style="display:inline;">
+                    <input type="hidden" name="edit_id" value="{{ tarefa.id }}">
+                    <button type="submit">Editar</button>
+                </form>
+
+                <!-- Botão Excluir -->
+                <form method="POST" action="{% url 'gerencia_tarefa' %}" style="display:inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="acao" value="excluir">
+                    <input type="hidden" name="tarefa_id" value="{{ tarefa.id }}">
+                    <button type="submit" onclick="return confirm('Deseja realmente excluir esta tarefa?');">Excluir</button>
+                </form>
+            </li>
+        {% empty %}
+            <li>Nenhuma tarefa cadastrada no momento.</li>
+        {% endfor %}
+    </ul>
+{% endblock %}
